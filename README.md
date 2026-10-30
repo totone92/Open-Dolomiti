@@ -61,7 +61,7 @@ errore. Non incollare mai credenziali, codice fiscale, POD/PDR o numeri di contr
 I test (`tests/`) usano solo risposte d'esempio **inventate** e non richiedono Home Assistant:
 
 ```bash
-python -m pip install pytest
+python -m pip install pytest aiohttp
 python -m pytest tests
 ```
 

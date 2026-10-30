@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import zipfile
 from datetime import date, datetime, timedelta
+from xml.etree import ElementTree
 from zoneinfo import ZoneInfo
 
 from homeassistant.components.recorder import get_instance
@@ -23,7 +25,7 @@ from .const import (
     TIPO_LUCE,
 )
 from .parsing import (
-    Fornitura, forniture_da_risposta, giorni_da_xlsx, giorno_da_risposta, mesi_preferiti, righe_statistiche,
+    ErroreFormato, Fornitura, forniture_da_risposta, giorni_da_xlsx, giorno_da_risposta, mesi_preferiti, righe_statistiche,
     ultima_bolletta,
 )
 
@@ -62,12 +64,14 @@ class CoordinatoreDolomiti(DataUpdateCoordinator[dict]):
             dati = await self._aggiorna()
         except ErroreAutenticazione as err:
             raise ConfigEntryAuthFailed("credenziali rifiutate da myDolomiti") from err
-        except ErroreConnessione as err:
+        except (ErroreConnessione, ErroreFormato, ValueError) as err:
             self._errori += 1
             attesa = min(INTERVALLO, RITENTA_MIN * (2 ** (self._errori - 1)))
             self.update_interval = attesa
-            _LOGGER.warning("aggiornamento non riuscito (%s), nuovo tentativo tra %s", err, attesa)
-            raise UpdateFailed(str(err)) from err
+            # di un ValueError solo il tipo: il messaggio può riportare valori della risposta
+            motivo = type(err).__name__ if isinstance(err, ValueError) else str(err)
+            _LOGGER.warning("aggiornamento non riuscito (%s), nuovo tentativo tra %s", motivo, attesa)
+            raise UpdateFailed(motivo) from err
         self._errori = 0
         self.update_interval = INTERVALLO
         return dati
@@ -111,17 +115,27 @@ class CoordinatoreDolomiti(DataUpdateCoordinator[dict]):
     async def _aggiorna_storico(self, luce: Fornitura, oggi: date) -> int:
         giorni: dict[str, list] = self._storico["giorni"]
         cambiati: set[date] = set()
+        try:
+            await self._scarica_giorni(luce, oggi, giorni, cambiati)
+        finally:
+            # anche dopo un errore: i giorni già scaricati non si riscaricano, senza import mancherebbero per sempre
+            if cambiati:
+                self._importa(luce, {date.fromisoformat(k): v for k, v in giorni.items()}, min(cambiati))
+                await self._store.async_save(self._storico)
+        return len(cambiati)
+
+    async def _scarica_giorni(self, luce: Fornitura, oggi: date, giorni: dict[str, list], cambiati: set[date]) -> None:
         if not self._storico.get("riempimento_file"):
             # il file excel (120 giorni) si legge finché non riesce una volta; i giorni scaricati uno per uno restano
             try:
                 dal_file = giorni_da_xlsx(await self.client.consumi_periodo_xlsx(luce.contratto, GIORNI_INIZIALI))
-            except (ErroreConnessione, ValueError, KeyError) as err:
+            except (ErroreConnessione, ValueError, KeyError, IndexError, zipfile.BadZipFile, ElementTree.ParseError) as err:
                 _LOGGER.warning("riempimento iniziale dal file non riuscito (%s): si scarica giorno per giorno",
                                 type(err).__name__)
                 dal_file = {}
             if dal_file:
                 if not giorni:
-                    await get_instance(self.hass).async_clear_statistics([self.statistic_id(luce)])
+                    get_instance(self.hass).async_clear_statistics([self.statistic_id(luce)])   # @callback, senza await
                 self._storico["riempimento_file"] = date.today().isoformat()
                 for g, valori in dal_file.items():
                     giorni[g.isoformat()] = valori
@@ -155,11 +169,6 @@ class CoordinatoreDolomiti(DataUpdateCoordinator[dict]):
             self._storico["ultimo"] = {"giorno": ultimo_giorno,
                                        "totale": round(g.totale if g.disponibile else sum(giorni[ultimo_giorno]), 3),
                                        "picco_kw": g.picco_kw, "fascia_picco": g.fascia_picco}
-
-        if cambiati:
-            self._importa(luce, {date.fromisoformat(k): v for k, v in giorni.items()}, min(cambiati))
-            await self._store.async_save(self._storico)
-        return len(cambiati)
 
     def _importa(self, luce: Fornitura, giorni: dict[date, list], dal: date) -> None:
         righe = righe_statistiche(giorni, self.fuso, dal)
