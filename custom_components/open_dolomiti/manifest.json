@@ -1,6 +1,9 @@
 {
   "domain": "open_dolomiti",
   "name": "Open Dolomiti (non ufficiale)",
+  "categories": [
+    "energy"
+  ],
   "codeowners": [
     "@totone92"
   ],
@@ -8,10 +11,10 @@
   "dependencies": [
     "recorder"
   ],
-  "documentation": "https://github.com/totone92/open-dolomiti",
+  "documentation": "https://github.com/totone92/Open-Dolomiti",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/totone92/open-dolomiti/issues",
+  "issue_tracker": "https://github.com/totone92/Open-Dolomiti/issues",
   "requirements": [],
   "version": "0.1.0"
 }

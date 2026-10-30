@@ -53,7 +53,7 @@ e riavvia.
 
 ## Problemi
 
-Apri una [segnalazione](https://github.com/totone92/open-dolomiti/issues) con la versione e il messaggio di
+Apri una [segnalazione](https://github.com/totone92/Open-Dolomiti/issues) con la versione e il messaggio di
 errore. Non incollare mai credenziali, codice fiscale, POD/PDR o numeri di contratto.
 
 ## Sviluppo
