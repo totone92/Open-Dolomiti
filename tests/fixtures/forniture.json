@@ -1,0 +1,24 @@
+{
+ "data": {
+  "supplies": [
+   {
+    "contractId": "C-0000001",
+    "contractualAccount": "A-0000001",
+    "podPdr": "IT000E00000000",
+    "supplyType": "ENERGY",
+    "offerName": "Offerta Luce Esempio",
+    "endDate": "2031-03-31",
+    "meterType2G": true
+   },
+   {
+    "contractId": "C-0000002",
+    "contractualAccount": "A-0000002",
+    "podPdr": "00000000000000",
+    "supplyType": "GAS",
+    "offerName": "Offerta Gas Esempio",
+    "endDate": "2031-01-31",
+    "meterType2G": false
+   }
+  ]
+ }
+}

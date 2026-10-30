@@ -1,0 +1,106 @@
+{
+ "data": {
+  "dataAvailable": true,
+  "total": 10.5,
+  "powerPeak": 3.1,
+  "rangePeakPower": "tra le 20:00 e le 21:00",
+  "hourlyConsumptions": [
+   {
+    "hour": 0,
+    "total": 0.25
+   },
+   {
+    "hour": 1,
+    "total": 0.3
+   },
+   {
+    "hour": 2,
+    "total": 0.35
+   },
+   {
+    "hour": 3,
+    "total": 0.4
+   },
+   {
+    "hour": 4,
+    "total": 0.45
+   },
+   {
+    "hour": 5,
+    "total": 0.25
+   },
+   {
+    "hour": 6,
+    "total": 0.3
+   },
+   {
+    "hour": 7,
+    "total": 0.35
+   },
+   {
+    "hour": 8,
+    "total": 0.4
+   },
+   {
+    "hour": 9,
+    "total": 0.45
+   },
+   {
+    "hour": 10,
+    "total": 0.25
+   },
+   {
+    "hour": 11,
+    "total": 0.3
+   },
+   {
+    "hour": 12,
+    "total": 0.35
+   },
+   {
+    "hour": 13,
+    "total": 0.4
+   },
+   {
+    "hour": 14,
+    "total": 0.45
+   },
+   {
+    "hour": 15,
+    "total": 0.25
+   },
+   {
+    "hour": 16,
+    "total": 0.3
+   },
+   {
+    "hour": 17,
+    "total": 0.35
+   },
+   {
+    "hour": 18,
+    "total": 0.4
+   },
+   {
+    "hour": 19,
+    "total": 0.45
+   },
+   {
+    "hour": 20,
+    "total": 0.25
+   },
+   {
+    "hour": 21,
+    "total": 0.3
+   },
+   {
+    "hour": 22,
+    "total": 0.35
+   },
+   {
+    "hour": 23,
+    "total": 0.4
+   }
+  ]
+ }
+}

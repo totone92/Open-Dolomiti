@@ -1,0 +1,79 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Open Dolomiti (unofficial)",
+        "description": "Credentials of the myDolomiti customer area. They are stored only in this Home Assistant configuration. Unofficial integration, not affiliated with Dolomiti Energia.",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Sign in to myDolomiti again",
+        "description": "The login is no longer valid: enter the password again.",
+        "data": {
+          "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Change credentials",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "credenziali_errate": "Email or password rejected by myDolomiti.",
+      "connessione": "myDolomiti did not answer or answered unexpectedly. Try again later.",
+      "codice_fiscale": "The profile has no fiscal code of the account holder: no supplies linked to this account?"
+    },
+    "abort": {
+      "already_configured": "This account is already configured.",
+      "reauth_successful": "Login renewed.",
+      "reconfigure_successful": "Credentials updated.",
+      "account_diverso": "These credentials belong to a different account."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "ultimo_giorno": {
+        "name": "Consumption of last available day"
+      },
+      "data_ultimo_giorno": {
+        "name": "Last available day"
+      },
+      "picco_potenza": {
+        "name": "Power peak"
+      },
+      "fascia_picco": {
+        "name": "Power peak time slot"
+      },
+      "mese_corrente": {
+        "name": "Consumption this month"
+      },
+      "mese_precedente": {
+        "name": "Consumption last month"
+      },
+      "offerta": {
+        "name": "Offer {tipo}"
+      },
+      "fine_contratto": {
+        "name": "Contract end {tipo}"
+      },
+      "bolletta_importo": {
+        "name": "Last bill {tipo}"
+      },
+      "bolletta_periodo": {
+        "name": "Last bill period {tipo}"
+      },
+      "bolletta_scadenza": {
+        "name": "Last bill due date {tipo}"
+      },
+      "bolletta_stato": {
+        "name": "Last bill status {tipo}"
+      }
+    }
+  }
+}

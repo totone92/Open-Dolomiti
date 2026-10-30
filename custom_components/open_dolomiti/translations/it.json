@@ -1,0 +1,79 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Open Dolomiti (non ufficiale)",
+        "description": "Credenziali dell'area clienti myDolomiti. Restano solo in questa configurazione di Home Assistant. Integrazione non ufficiale, non affiliata a Dolomiti Energia.",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Nuovo accesso a myDolomiti",
+        "description": "Il login non è più valido: inserisci di nuovo la password.",
+        "data": {
+          "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Modifica le credenziali",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "credenziali_errate": "Email o password non accettate da myDolomiti.",
+      "connessione": "myDolomiti non risponde o ha risposto in modo inatteso. Riprova più tardi.",
+      "codice_fiscale": "Il profilo non contiene il codice fiscale del titolare: l'account non ha forniture collegate?"
+    },
+    "abort": {
+      "already_configured": "Questo account è già configurato.",
+      "reauth_successful": "Accesso rinnovato.",
+      "reconfigure_successful": "Credenziali aggiornate.",
+      "account_diverso": "Le credenziali sono di un altro account."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "ultimo_giorno": {
+        "name": "Consumo ultimo giorno disponibile"
+      },
+      "data_ultimo_giorno": {
+        "name": "Data ultimo giorno disponibile"
+      },
+      "picco_potenza": {
+        "name": "Picco di potenza"
+      },
+      "fascia_picco": {
+        "name": "Fascia oraria del picco"
+      },
+      "mese_corrente": {
+        "name": "Consumo mese in corso"
+      },
+      "mese_precedente": {
+        "name": "Consumo mese precedente"
+      },
+      "offerta": {
+        "name": "Offerta {tipo}"
+      },
+      "fine_contratto": {
+        "name": "Fine contratto {tipo}"
+      },
+      "bolletta_importo": {
+        "name": "Ultima bolletta {tipo}"
+      },
+      "bolletta_periodo": {
+        "name": "Periodo ultima bolletta {tipo}"
+      },
+      "bolletta_scadenza": {
+        "name": "Scadenza ultima bolletta {tipo}"
+      },
+      "bolletta_stato": {
+        "name": "Stato ultima bolletta {tipo}"
+      }
+    }
+  }
+}

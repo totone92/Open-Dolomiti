@@ -1,0 +1,42 @@
+{
+  "entity": {
+    "sensor": {
+      "ultimo_giorno": {
+        "default": "mdi:lightning-bolt"
+      },
+      "data_ultimo_giorno": {
+        "default": "mdi:calendar-check"
+      },
+      "picco_potenza": {
+        "default": "mdi:flash-alert"
+      },
+      "fascia_picco": {
+        "default": "mdi:clock-time-six-outline"
+      },
+      "mese_corrente": {
+        "default": "mdi:calendar-month"
+      },
+      "mese_precedente": {
+        "default": "mdi:calendar-arrow-left"
+      },
+      "offerta": {
+        "default": "mdi:file-document-outline"
+      },
+      "fine_contratto": {
+        "default": "mdi:calendar-end"
+      },
+      "bolletta_importo": {
+        "default": "mdi:receipt-text-outline"
+      },
+      "bolletta_periodo": {
+        "default": "mdi:calendar-range"
+      },
+      "bolletta_scadenza": {
+        "default": "mdi:calendar-alert"
+      },
+      "bolletta_stato": {
+        "default": "mdi:receipt-text-check-outline"
+      }
+    }
+  }
+}

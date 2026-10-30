@@ -1,0 +1,22 @@
+{
+ "data": {
+  "bills": [
+   {
+    "billAmount": 41.2,
+    "billedPeriodFrom": "2030-01-01",
+    "billedPeriodAt": "2030-02-28",
+    "expirationDate": "2030-03-20",
+    "status": "PAGATA",
+    "payable": false
+   },
+   {
+    "billAmount": "55,90",
+    "billedPeriodFrom": "2030-03-01",
+    "billedPeriodAt": "2030-04-30",
+    "expirationDate": "2030-05-20",
+    "status": "DA PAGARE",
+    "payable": true
+   }
+  ]
+ }
+}

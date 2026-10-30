@@ -1,0 +1,16 @@
+{
+ "data": {
+  "currentMonth": {
+   "total": 120.5,
+   "firstDay": "2030-05-01",
+   "lastDay": "2030-05-20",
+   "month": "05"
+  },
+  "previousMonth": {
+   "total": 250.25,
+   "firstDay": "2030-04-01",
+   "lastDay": "2030-04-30",
+   "month": "04"
+  }
+ }
+}
