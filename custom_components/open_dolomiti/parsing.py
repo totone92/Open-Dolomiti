@@ -267,9 +267,10 @@ def ore_utc(giorno: date, valori: list[float], fuso: ZoneInfo) -> dict[datetime,
     return out
 
 
-def righe_statistiche(giorni: dict[date, list[float]], fuso: ZoneInfo, dal: date | None = None) -> list[dict]:
-    """Righe orarie con somma cumulativa (kWh) dall'inizio dello storico; solo quelle da "dal" in poi."""
-    somma, righe = 0.0, []
+def righe_statistiche(giorni: dict[date, list[float]], fuso: ZoneInfo, dal: date | None = None,
+                      base: float = 0.0) -> list[dict]:
+    """Righe orarie con somma cumulativa (kWh) da "base" all'inizio dello storico; solo quelle da "dal" in poi."""
+    somma, righe = base, []
     for g in sorted(giorni):
         for inizio, v in sorted(ore_utc(g, giorni[g], fuso).items()):
             somma += v

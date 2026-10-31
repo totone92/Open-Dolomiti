@@ -19,10 +19,16 @@ ADESSO = datetime(2030, 1, 5, 12, tzinfo=ZoneInfo("Europe/Rome"))
 class FintoRecorder:
     def __init__(self):
         self.cancellate = []
+        self.precedenti = {}
+        self.letture = 0
 
     def async_clear_statistics(self, statistic_ids, *, on_done=None):
         """In Home Assistant è una @callback: mette in coda e restituisce None, non si può usare con await."""
         self.cancellate.append(statistic_ids)
+
+    async def async_add_executor_job(self, funzione, *argomenti):
+        self.letture += 1
+        return funzione(self.precedenti, *argomenti[1:])
 
 
 class FintoStore:
@@ -69,7 +75,8 @@ def ambiente(monkeypatch):
             StatisticMeanType=enum.Enum("StatisticMeanType", "NONE")),
         "homeassistant.components.recorder.statistics": _modulo(
             "homeassistant.components.recorder.statistics",
-            async_add_external_statistics=lambda _h, meta, righe: importate.append((meta, righe))),
+            async_add_external_statistics=lambda _h, meta, righe: importate.append((meta, righe)),
+            statistics_during_period=lambda precedenti, *_: precedenti),
         "homeassistant.config_entries": _modulo("homeassistant.config_entries", ConfigEntry=object),
         "homeassistant.core": _modulo("homeassistant.core", HomeAssistant=object),
         "homeassistant.exceptions": _modulo("homeassistant.exceptions", ConfigEntryAuthFailed=Sbagliato),
@@ -177,3 +184,27 @@ def test_risposta_inattesa_diventa_nuovo_tentativo(ambiente):
     with pytest.raises(sys.modules["homeassistant.helpers.update_coordinator"].UpdateFailed):
         asyncio.run(c._async_update_data())
     assert c.update_interval == timedelta(minutes=30)
+
+
+def test_somma_continua_da_uno_storico_piu_vecchio(ambiente, monkeypatch):
+    """Righe in statistica più vecchie dell'archivio locale: le nuove proseguono la somma, senza salti all'indietro."""
+    c = _coordinatore(ambiente, FintoClient(ambiente))
+    c._storico = {"giorni": {"2030-01-02": [0.5] * 24}, "riempimento_file": "2030-01-03", "ultimo": None}
+    luce = ambiente.modulo.Fornitura("abc", "ENERGY", None, None, True)
+    ambiente.recorder.precedenti = {c.statistic_id(luce): [{"sum": 100.0}, {"sum": 111.825}]}
+    giorni = {date(2030, 1, 2): [0.5] * 24, date(2030, 1, 3): [1.0] * 24}
+    asyncio.run(c._importa(luce, giorni, date(2030, 1, 3)))
+    righe = ambiente.importate[0][1]
+    assert len(righe) == 24
+    assert righe[0]["sum"] == pytest.approx(111.825 + 12 + 1)
+    assert righe[-1]["sum"] == pytest.approx(111.825 + 12 + 24)
+
+
+def test_dopo_la_cancellazione_la_somma_riparte_da_zero(ambiente, monkeypatch):
+    _file(ambiente, monkeypatch)
+    c = _coordinatore(ambiente, FintoClient(ambiente))
+    ambiente.recorder.precedenti = {"open_dolomiti:elettricita_x": [{"sum": 500.0}]}
+    asyncio.run(c._async_update_data())
+    assert ambiente.recorder.letture == 0
+    assert ambiente.importate[0][1][0]["sum"] == pytest.approx(0.5)
+

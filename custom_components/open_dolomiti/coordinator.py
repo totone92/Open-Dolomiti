@@ -11,7 +11,7 @@ from zoneinfo import ZoneInfo
 
 from homeassistant.components.recorder import get_instance
 from homeassistant.components.recorder.models import StatisticData, StatisticMeanType, StatisticMetaData
-from homeassistant.components.recorder.statistics import async_add_external_statistics
+from homeassistant.components.recorder.statistics import async_add_external_statistics, statistics_during_period
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
@@ -48,6 +48,7 @@ class CoordinatoreDolomiti(DataUpdateCoordinator[dict]):
         self._bollette: dict[str, dict | None] = {}
         self._contratti_aggiornati: datetime | None = None
         self._errori = 0
+        self._statistica_cancellata = False
         self.ultimo_esito: dict = {}
 
     @property
@@ -120,7 +121,7 @@ class CoordinatoreDolomiti(DataUpdateCoordinator[dict]):
         finally:
             # anche dopo un errore: i giorni già scaricati non si riscaricano, senza import mancherebbero per sempre
             if cambiati:
-                self._importa(luce, {date.fromisoformat(k): v for k, v in giorni.items()}, min(cambiati))
+                await self._importa(luce, {date.fromisoformat(k): v for k, v in giorni.items()}, min(cambiati))
                 await self._store.async_save(self._storico)
         return len(cambiati)
 
@@ -136,6 +137,7 @@ class CoordinatoreDolomiti(DataUpdateCoordinator[dict]):
             if dal_file:
                 if not giorni:
                     get_instance(self.hass).async_clear_statistics([self.statistic_id(luce)])   # @callback, senza await
+                    self._statistica_cancellata = True
                 self._storico["riempimento_file"] = date.today().isoformat()
                 for g, valori in dal_file.items():
                     giorni[g.isoformat()] = valori
@@ -170,8 +172,19 @@ class CoordinatoreDolomiti(DataUpdateCoordinator[dict]):
                                        "totale": round(g.totale if g.disponibile else sum(giorni[ultimo_giorno]), 3),
                                        "picco_kw": g.picco_kw, "fascia_picco": g.fascia_picco}
 
-    def _importa(self, luce: Fornitura, giorni: dict[date, list], dal: date) -> None:
-        righe = righe_statistiche(giorni, self.fuso, dal)
+    async def _somma_precedente(self, luce: Fornitura, primo: date) -> float:
+        """Somma già in statistica prima dell'archivio locale (storico più vecchio di quello offerto dal portale)."""
+        if self._statistica_cancellata:     # la cancellazione è in coda: quelle righe non valgono più
+            return 0.0
+        inizio = datetime(primo.year, primo.month, primo.day, tzinfo=self.fuso)
+        trovate = await get_instance(self.hass).async_add_executor_job(
+            statistics_during_period, self.hass, inizio - timedelta(days=3650), inizio, {self.statistic_id(luce)},
+            "hour", None, {"sum"})
+        righe = trovate.get(self.statistic_id(luce))
+        return float(righe[-1]["sum"]) if righe else 0.0
+
+    async def _importa(self, luce: Fornitura, giorni: dict[date, list], dal: date) -> None:
+        righe = righe_statistiche(giorni, self.fuso, dal, await self._somma_precedente(luce, min(giorni)))
         meta = StatisticMetaData(mean_type=StatisticMeanType.NONE, has_sum=True,
                                  name="Open Dolomiti elettricità (consumi orari)", source=DOMAIN,
                                  statistic_id=self.statistic_id(luce), unit_class="energy",
