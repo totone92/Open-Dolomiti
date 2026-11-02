@@ -5,9 +5,8 @@ from __future__ import annotations
 import hashlib
 import logging
 import zipfile
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, tzinfo
 from xml.etree import ElementTree
-from zoneinfo import ZoneInfo
 
 from homeassistant.components.recorder import get_instance
 from homeassistant.components.recorder.models import StatisticData, StatisticMeanType, StatisticMetaData
@@ -52,8 +51,8 @@ class CoordinatoreDolomiti(DataUpdateCoordinator[dict]):
         self.ultimo_esito: dict = {}
 
     @property
-    def fuso(self) -> ZoneInfo:
-        return ZoneInfo(self.hass.config.time_zone)
+    def fuso(self) -> tzinfo:
+        return dt_util.get_default_time_zone()
 
     def statistic_id(self, fornitura: Fornitura) -> str:
         return f"{DOMAIN}:elettricita_{fornitura.chiave}"

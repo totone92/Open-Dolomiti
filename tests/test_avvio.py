@@ -86,7 +86,8 @@ def ambiente(monkeypatch):
             "homeassistant.helpers.update_coordinator", DataUpdateCoordinator=FintoCoordinatore,
             UpdateFailed=type("UpdateFailed", (Exception,), {})),
         "homeassistant.util": _modulo("homeassistant.util"),
-        "homeassistant.util.dt": _modulo("homeassistant.util.dt", now=lambda: ADESSO),
+        "homeassistant.util.dt": _modulo("homeassistant.util.dt", now=lambda: ADESSO,
+                                         get_default_time_zone=lambda: ADESSO.tzinfo),
     }
     moduli["homeassistant.util"].dt = moduli["homeassistant.util.dt"]
     pacchetto = types.ModuleType("custom_components.open_dolomiti")   # senza __init__.py: serve solo il coordinatore
@@ -130,7 +131,7 @@ class FintoClient:
 
 
 def _coordinatore(ambiente, client):
-    hass = types.SimpleNamespace(config=types.SimpleNamespace(time_zone="Europe/Rome"))
+    hass = types.SimpleNamespace()
     return ambiente.modulo.CoordinatoreDolomiti(hass, types.SimpleNamespace(entry_id="voce"), client)
 
 
